@@ -31,6 +31,12 @@ jobs:
 
       - run: npm install
 
+      - name: Pin brotli to stable-compatible version
+        working-directory: src-tauri
+        run: |
+          cargo generate-lockfile
+          cargo update -p brotli --precise 7.0.0
+
       - name: Build
         run: npx tauri build
 
