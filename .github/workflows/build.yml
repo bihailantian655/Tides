@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: 20
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@nightly
 
       - name: Cache Rust
         uses: actions/cache@v4
@@ -31,19 +31,13 @@ jobs:
 
       - run: npm install
 
-      - name: Diagnose alloc-no-stdlib version conflict
+      - name: Pin brotli ecosystem
         working-directory: src-tauri
-        shell: bash
         run: |
           cargo generate-lockfile
-          echo "=== Crates depending on alloc-no-stdlib ==="
-          cargo tree -i alloc-no-stdlib -f "{p} {r}" 2>&1 || true
-          echo ""
-          echo "=== alloc-no-stdlib entries in lockfile ==="
-          grep -A3 'name = "alloc-no-stdlib"' Cargo.lock 2>/dev/null || true
-          echo ""
-          echo "=== alloc-stdlib entries in lockfile ==="
-          grep -A3 'name = "alloc-stdlib"' Cargo.lock 2>/dev/null || true
+          cargo update -p brotli --precise 8.0.0
+          cargo update -p brotli-decompressor --precise 5.0.0
+          cargo update -p brotli-encoder --precise 5.0.0
 
       - name: Build
         run: npx tauri build
