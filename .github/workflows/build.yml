@@ -31,11 +31,11 @@ jobs:
 
       - run: npm install
 
-      - name: Pin brotli to stable-compatible version
+      - name: Pin alloc-no-stdlib to v2 to avoid trait conflict
         working-directory: src-tauri
         run: |
           cargo generate-lockfile
-          cargo update -p brotli --precise 8.0.2
+          cargo update -p alloc-no-stdlib --precise 2.0.4
 
       - name: Build
         run: npx tauri build
