@@ -1,0 +1,11 @@
+{
+  "identifier": "default",
+  "description": "Default capabilities for MobileBrowser",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:default",
+    "core:webview:default",
+    "core:event:default"
+  ]
+}
