@@ -31,29 +31,19 @@ jobs:
 
       - run: npm install
 
-      - name: Diagnose and fix alloc-no-stdlib version conflict
+      - name: Diagnose alloc-no-stdlib version conflict
         working-directory: src-tauri
+        shell: bash
         run: |
           cargo generate-lockfile
           echo "=== Crates depending on alloc-no-stdlib ==="
           cargo tree -i alloc-no-stdlib -f "{p} {r}" 2>&1 || true
           echo ""
-          echo "=== Checking if alloc-no-stdlib v3 is present ==="
-          grep -c "alloc-no-stdlib" Cargo.lock 2>/dev/null || true
+          echo "=== alloc-no-stdlib entries in lockfile ==="
           grep -A3 'name = "alloc-no-stdlib"' Cargo.lock 2>/dev/null || true
           echo ""
-          echo "=== Checking alloc-stdlib versions ==="
+          echo "=== alloc-stdlib entries in lockfile ==="
           grep -A3 'name = "alloc-stdlib"' Cargo.lock 2>/dev/null || true
-          echo ""
-          echo "=== Attempting to force alloc-no-stdlib@2.0.4 only ==="
-          # Try to update the v3 entry if it exists; fail gracefully
-          cargo update -p alloc-no-stdlib@2.0.4 --precise 2.0.4 2>&1 || true
-          # If v3 exists, try to find its parent and update
-          if grep -q 'alloc-no-stdlib.*3\.0\.0' Cargo.lock 2>/dev/null; then
-            echo "WARNING: alloc-no-stdlib 3.0.0 detected in lockfile!"
-            echo "Finding reverse deps..."
-            cargo tree -i alloc-no-stdlib@3.0.0 -f "{p} {r}" 2>&1 || true
-          fi
 
       - name: Build
         run: npx tauri build
