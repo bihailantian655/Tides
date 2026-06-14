@@ -35,7 +35,7 @@ jobs:
         working-directory: src-tauri
         run: |
           cargo generate-lockfile
-          cargo update -p alloc-no-stdlib --precise 2.0.4
+          cargo update -p alloc-no-stdlib@2.0.4 --precise 2.0.4
 
       - name: Build
         run: npx tauri build
