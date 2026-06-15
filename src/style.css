@@ -130,15 +130,9 @@ header h1 {
   font-size: 11px;
 }
 
-.btn.close {
+.btn.scroll {
   width: 28px;
-  color: #666;
-}
-
-.btn.close:hover {
-  background: #e94560;
-  border-color: #e94560;
-  color: white;
+  font-size: 10px;
 }
 
 footer {

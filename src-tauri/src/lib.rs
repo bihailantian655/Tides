@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 
 const MOBILE_UA: &str = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1";
@@ -51,10 +52,22 @@ fn reload_page(app: tauri::AppHandle, panel_id: usize) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn close_panel(app: tauri::AppHandle, panel_id: usize) -> Result<(), String> {
+fn scroll_up(app: tauri::AppHandle, panel_id: usize) -> Result<(), String> {
     let label = format!("panel-{}", panel_id);
     let window = app.get_webview_window(&label).ok_or("panel not found")?;
-    window.close().map_err(|e| e.to_string())?;
+    window
+        .eval("window.scrollBy(0, -300)")
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+fn scroll_down(app: tauri::AppHandle, panel_id: usize) -> Result<(), String> {
+    let label = format!("panel-{}", panel_id);
+    let window = app.get_webview_window(&label).ok_or("panel not found")?;
+    window
+        .eval("window.scrollBy(0, 300)")
+        .map_err(|e| e.to_string())?;
     Ok(())
 }
 
@@ -62,9 +75,16 @@ pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
             let (pw, ph) = PANEL_SIZE;
+            let app_data = app
+                .path()
+                .app_data_dir()
+                .expect("failed to get app data dir");
+
             for i in 0..4 {
                 let label = format!("panel-{}", i);
                 let (x, y) = PANEL_POSITIONS[i];
+                let data_dir = app_data.join(format!("panel-{}", i));
+
                 WebviewWindowBuilder::new(
                     app.handle(),
                     &label,
@@ -76,6 +96,7 @@ pub fn run() {
                 .title(format!("Panel {}", i + 1))
                 .decorations(false)
                 .resizable(false)
+                .data_directory(data_dir)
                 .build()?;
             }
             Ok(())
@@ -85,7 +106,8 @@ pub fn run() {
             go_back,
             go_forward,
             reload_page,
-            close_panel,
+            scroll_up,
+            scroll_down,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
